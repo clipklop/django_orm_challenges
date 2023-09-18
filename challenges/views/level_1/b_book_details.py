@@ -15,8 +15,11 @@ from challenges.models import Book
 
 
 def get_book(book_id: int) -> Book | None:
-    # код писать тут
-    pass
+    filter_books = Book.objects.filter(id=book_id)
+    if filter_books.exists():
+        return Book.objects.get(id=book_id)
+    else:
+        return None
 
 
 def book_details_handler(request: HttpRequest, book_id: int) -> HttpResponse:
