@@ -42,5 +42,5 @@ class BlogPost(models.Model):
     category = models.CharField(
         max_length=50,
         choices=[("general", "general"), ("programming", "programming"), ("sport", "sport"), ("food", "food")],
-        default="general"
+        default=None
     )
