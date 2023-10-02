@@ -10,9 +10,10 @@
 - по очереди реализовать каждую из вьюх в этом файле, проверяя правильность их работу в браузере
 """
 import json
-import datetime
+from datetime import datetime
 
 from django.http import HttpRequest, JsonResponse
+from django.db.models import Q
 
 from challenges.models import BlogPost
 from challenges.utils.serializer import to_json
@@ -39,7 +40,8 @@ def posts_search_view(request: HttpRequest) -> JsonResponse:
     if not get_query:
         return JsonResponse(status=404, data={'message': f"Missing 'query' parameter in the query"})
     
-    post_query = BlogPost.objects.filter(name__icontains=get_query, text__icontains=get_query)
+    # post_query = BlogPost.objects.filter(text__icontains=get_query)
+    post_query = BlogPost.objects.filter(Q(name__icontains=get_query) | Q(text__icontains=get_query))
     post_serialize = json.loads(to_json(post_query))
 
     return JsonResponse(post_serialize, safe=False)
@@ -82,8 +84,8 @@ def last_days_posts_list_view(request: HttpRequest) -> JsonResponse:
     get_last_days = request.GET.get('last_days')
     if not get_last_days:
         return JsonResponse(status=404, data={'message': f"Missing 'last_days' parameter in the query"})
-    print(datetime.date(get_last_days))
-    post_last_days = BlogPost.objects.filter(creation_date__gte=datetime.date(get_last_days))
+    
+    post_last_days = BlogPost.objects.filter(publication_date__gt=datetime.strptime(get_last_days, '%Y-%m-%d'))
     post_serialize = json.loads(to_json(post_last_days))
 
     return JsonResponse(post_serialize, safe=False)
